@@ -5,7 +5,8 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 module.exports = {
   entry: './src/index.js',
   target: 'node',
-  mode: 'production',
+  devtool: 'inline-source-map',
+  mode: 'development',
   module: {
     rules: [
       {
@@ -28,7 +29,7 @@ module.exports = {
     new CleanWebpackPlugin(),
   ],
   optimization: {
-		minimize: true
+		minimize: false
   },
   externals: [
     {},

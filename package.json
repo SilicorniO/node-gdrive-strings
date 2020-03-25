@@ -1,10 +1,11 @@
 {
   "name": "node-gdrive-strings",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Generate string files using a Google Drive Spreadsheet",
-  "main": "src/index.js",
+  "main": "dist/index.js",
   "scripts": {
     "example1": "node examples/example1.js",
+    "dev": "webpack --config webpack.dev.config.js",
     "build": "webpack --config webpack.config.js",
     "test": "jest",
     "lint": "tsc --noEmit && eslint --ext .js,.jsx,.ts,.tsx ./",
