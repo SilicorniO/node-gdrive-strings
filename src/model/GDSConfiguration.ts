@@ -13,4 +13,7 @@ export default interface GDSConfiguration {
 
   /** Temporary file path, can be used one by default */
   tempPath?: string
+
+  /** Show debug logs */
+  debug?: boolean
 }

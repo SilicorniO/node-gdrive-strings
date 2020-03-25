@@ -1,4 +1,4 @@
-var GDriveStrings = require("../dist/node-gdrive-strings");
+var GDriveStrings = require("../dist/index");
 
 // pages to process
 var PAGE_1 = "https://docs.google.com/spreadsheets/d/e/2PACX-1vShmL8AkNUcAjsvKWxmoTr2FWIr7CURzoPMnlNCFLxWiqpQuUAmEhpAxoNsISP86CV1mlhOazerZebG/pub?gid=0&single=true&output=csv"
@@ -12,7 +12,8 @@ var SHEET_CSV_URLS = [
 var configuration = {
 	outputType: "json",
   outputPath: "./examples/strings",
-  tempPath: "./dist/node-strings-temp.csv",
+	tempPath: "./dist/node-strings-temp.csv",
+	debug: true,
 }
 
 var core = new GDriveStrings.Core();

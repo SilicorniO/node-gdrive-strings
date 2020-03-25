@@ -1,5 +1,6 @@
 import * as Fs from "fs"
 import GDSConfiguration, { GDSConfigurationOutputType } from "../model/GDSConfiguration"
+import Log from "../utils/log/Log"
 
 export default class LangGenerator {
 	public generateLangFiles(
@@ -7,6 +8,7 @@ export default class LangGenerator {
 		configuration: GDSConfiguration,
 	): Promise<void> {
 		return new Promise<void>( (resolve, reject) => {
+			Log.d(`Generating language files`)
 
 			const writeFilePromises: Promise<void>[] = []
 			for (const langKey of Object.keys(langs)) {
@@ -38,6 +40,7 @@ export default class LangGenerator {
 		langData: { [key: string]: string },
 	): Promise<void> {
 		return new Promise( (resolve, reject) => {
+			Log.d(`Generating Json language: '${langKey}'`)
 			// json to string
 			var langDataString = JSON.stringify(langData, null, "\t")
 

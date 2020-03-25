@@ -1,5 +1,6 @@
 import * as Https from "https"
 import * as Fs from "fs"
+import Log from "../utils/log/Log"
 
 export default class DownloadManager {
 
@@ -14,9 +15,11 @@ export default class DownloadManager {
 			Https.get(url, (response: any) => {
 				response.pipe(file)
 				file.on("finish", () => {
+					Log.d(`Sheet downloaded '${url}' into '${path}'`)
 					resolve()
 				})
 			}).on("error", (error) => {
+				Log.d(`Error downloading sheet '${url}'`)
 				reject(error)
 			})
 		})
@@ -30,8 +33,9 @@ export default class DownloadManager {
 	removeFile(path: string) {
 		try {
 			Fs.unlinkSync(path)
+			Log.d(`Temporary file '${path}' deleted`)
 		} catch(error) {
-			console.error(`Error removing file ${path}: ${error}`)
+			Log.e(`Error removing file ${path}: ${error}`)
 		}
 	}
 }

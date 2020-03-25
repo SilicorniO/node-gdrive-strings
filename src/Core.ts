@@ -2,6 +2,7 @@ import LangGenerator from "./managers/LangGenerator"
 import DownloadManager from "./managers/DownloadManager"
 import CsvManager from "./managers/CsvManager"
 import GDSConfiguration from "./model/GDSConfiguration"
+import Log from "./utils/log/Log"
 
 export default class Core {
 
@@ -20,6 +21,7 @@ export default class Core {
 		configuration: GDSConfiguration,
 		langs: { [key: string]: { [key: string]: string } },
 	): Promise<boolean> {
+		Log.d(`Processing sheet ${sheetUrl}`)
 
 		// define a temporary valid path
 		const tempPath = configuration.tempPath || Core.DEFAULT_TEMP_FILE_PATH
@@ -45,13 +47,13 @@ export default class Core {
 							this.downloadManager.removeFile(tempPath)
 
 							// reject
-							console.error(`Error converting data to CSV, it seems an app problem: ${error}`)
+							Log.e(`Error converting data to CSV, it seems an app problem: ${error}`)
 							resolve(false)
 						},
 					)
 				},
 				(error) => {
-					console.error(`Error downloading sheet ${sheetUrl}, check URL or permissions: ${error}`)
+					Log.e(`Error downloading sheet ${sheetUrl}, check URL or permissions: ${error}`)
 					resolve(false)
 				},
 			)
@@ -64,6 +66,11 @@ export default class Core {
 		cb: (result: boolean) => void,
 	) {
 		const langs: { [key: string]: { [key: string]: string } } = {}
+
+		// enable logs if enabled in configuration
+		if (configuration.debug != null && configuration.debug == true) {
+			Log.showLogsDebug = true
+		}
 
 		// prepare all sheet promises
 		let resultOk = true
@@ -81,7 +88,7 @@ export default class Core {
 		this.langGenerator.generateLangFiles(langs, configuration).then(
 			() => cb(true),
 			(error) => {
-				console.error(error)
+				Log.e(error)
 				cb(false)
 			},
 		)
