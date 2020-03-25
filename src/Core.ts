@@ -1,8 +1,14 @@
-import LangGenerator from "./LangGenerator"
-import DownloadManager from "./DownloadManager"
-import CsvManager from "./CsvManager"
+import LangGenerator from "./managers/LangGenerator"
+import DownloadManager from "./managers/DownloadManager"
+import CsvManager from "./managers/CsvManager"
+import GDSConfiguration from "./model/GDSConfiguration"
 
 export default class Core {
+
+	// constants
+	static readonly DEFAULT_TEMP_FILE_PATH = "./node-gdrive-strings.temp"
+
+	// managers
 	downloadManager = new DownloadManager()
 	csvManager = new CsvManager()
 	langGenerator = new LangGenerator()
@@ -11,82 +17,73 @@ export default class Core {
 
 	private executeSheet(
 		sheetUrl: string,
-		tempPath: string,
-		langs: { [key: string]: { [key: string]: string} },
-		cb: (result: boolean) => void,
-	) {
-		// download the sheet
-		this.downloadManager.downloadFile(sheetUrl, tempPath, (result) => {
-			if (!result) {
-				console.log("Download sheet error: '" + sheetUrl + "'")
-				cb(false)
-				return
-			}
+		configuration: GDSConfiguration,
+		langs: { [key: string]: { [key: string]: string } },
+	): Promise<boolean> {
 
-			// convert to json
-			this.csvManager.convertCsv(tempPath, (jsonData: { [key: string]: string }[] | null) => {
-				if (jsonData == null) {
-					cb(false)
-					return
-				}
+		// define a temporary valid path
+		const tempPath = configuration.tempPath || Core.DEFAULT_TEMP_FILE_PATH
 
-				// add to languages
-				this.csvManager.addJsonToLangs(jsonData, langs)
+		return new Promise((resolve, reject) => {
+			// download the sheet
+			this.downloadManager.downloadFile(sheetUrl, tempPath).then(
+				() => {
+					// convert to json
+					this.csvManager.convertCsv(tempPath).then(
+						(jsonData: { [key: string]: string }[]) => {
+							// add to languages
+							this.csvManager.addJsonToLangs(jsonData, langs)
 
-				// return ok
-				cb(true)
-			})
-		})
-	}
+							// remove temp path
+							this.downloadManager.removeFile(tempPath)
 
-	private executeSheets(
-		sheetUrls: string[],
-		tempPath: string,
-		langs: { [key: string]: { [key: string]: string} },
-		cb: (result: boolean) => void,
-	) {
-		if (sheetUrls.length === 0) {
-			return cb(true)
-		}
+							// resolve
+							resolve(true)
+						},
+						(error) => {
+							// remove temp path
+							this.downloadManager.removeFile(tempPath)
 
-		var sheetUrl = sheetUrls[0]
-		sheetUrls.splice(0, 1)
-
-		this.executeSheet(sheetUrl, tempPath, langs, (result) => {
-			if (!result) {
-				console.log("Error executing sheet '" + sheetUrl + "'")
-			}
-
-			// execute next sheet
-			this.executeSheets(sheetUrls, tempPath, langs, cb)
-		})
-	}
-
-	public run(
-    sheetUrls: string[],
-    tempPath: string,
-    outputPath: string,
-    cb: (result: boolean) => void,
-  ) {
-		const langs: { [key: string]: { [key: string]: string} } = {}
-
-		this.executeSheets(sheetUrls, tempPath, langs, (result) => {
-			if (!result) {
-				return cb(false)
-			}
-
-			// generate langs files
-			this.langGenerator.generateLangFiles(
-				langs,
-				outputPath,
-				(result: boolean) => {
-					if (!result) {
-						return cb(false)
-					}
-
-					cb(true)
+							// reject
+							console.error(`Error converting data to CSV, it seems an app problem: ${error}`)
+							resolve(false)
+						},
+					)
+				},
+				(error) => {
+					console.error(`Error downloading sheet ${sheetUrl}, check URL or permissions: ${error}`)
+					resolve(false)
 				},
 			)
 		})
+	}
+
+	public async run(
+		sheetUrls: string[],
+		configuration: GDSConfiguration,
+		cb: (result: boolean) => void,
+	) {
+		const langs: { [key: string]: { [key: string]: string } } = {}
+
+		// prepare all sheet promises
+		let resultOk = true
+		for (const sheetUrl of sheetUrls) {
+			resultOk = resultOk && await this.executeSheet(sheetUrl, configuration, langs)
+		}
+
+		// if false return here
+		if (!resultOk) {
+			cb(false)
+			return
+		}
+
+		// generate langs files
+		this.langGenerator.generateLangFiles(langs, configuration).then(
+			() => cb(true),
+			(error) => {
+				console.error(error)
+				cb(false)
+			},
+		)
 	}
 }

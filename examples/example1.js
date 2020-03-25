@@ -10,15 +10,13 @@ var SHEET_CSV_URLS = [
 
 // define the configuration to apply
 var configuration = {
-  outPath: "./strings",
-  tempFile: "./node-strings-temp.csv",
+	outputType: "json",
+  outputPath: "./examples/strings",
+  tempPath: "./dist/node-strings-temp.csv",
 }
 
-var TEMP_PATH = "node-strings-temp.csv"
-var OUTPUT_PATH = "src/assets/strings"
-
 var core = new GDriveStrings.Core();
-core.run(SHEET_CSV_URLS, TEMP_PATH, OUTPUT_PATH, function(result) {
+core.run(SHEET_CSV_URLS, configuration, function(result) {
 	if (result) {
 		console.log("Strings OK - STRINGS UPDATED")
 	} else {

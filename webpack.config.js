@@ -3,12 +3,10 @@ const path = require('path');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
 module.exports = {
-  entry: './index.js',
+  entry: './src/index.js',
+  target: 'node',
   devtool: 'inline-source-map',
   mode: 'development',
-  node: {
-    fs: "empty"
-  },
   module: {
     rules: [
       {
