@@ -21,7 +21,7 @@ module.exports = {
     modules: ['node_modules'],
   },
   output: {
-    filename: 'node-gdrive-strings.js',
+    filename: 'index.js',
     path: path.resolve(__dirname, 'dist'),
   },
   plugins: [
