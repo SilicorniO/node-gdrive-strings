@@ -1,7 +1,8 @@
 {
   "name": "node-gdrive-strings",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Generate string files using a Google Drive Spreadsheet",
+  "main": "src/index.js",
   "scripts": {
     "example1": "node examples/example1.js",
     "build": "webpack --config webpack.config.js",
@@ -20,6 +21,7 @@
     "strings",
     "sync"
   ],
+  "private": false,
   "author": "Javier S.R. @Silicornio",
   "license": "SEE LICENSE IN LICENSE",
   "bugs": {
