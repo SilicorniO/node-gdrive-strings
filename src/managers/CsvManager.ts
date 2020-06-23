@@ -29,6 +29,7 @@ export default class CsvManager {
 		jsonData.forEach((line: { [key: string]: string }) => {
 			var jsonLineKey = ""
 			Object.keys(line).forEach((lineKey: string) => {
+				Log.d(`lineKey: '${lineKey}'`)
 				const lineKeyLc = lineKey.toLowerCase()
 				if (lineKeyLc === "key") {
 					jsonLineKey = line[lineKey]

@@ -88,7 +88,7 @@ export default class Log {
   
       //object
       if(obj != null){
-          console.log(JSON.stringify(obj, null, 2));
+          console.log(obj);
       }
   }
   

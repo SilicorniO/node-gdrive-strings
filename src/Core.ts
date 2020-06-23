@@ -33,6 +33,8 @@ export default class Core {
 					// convert to json
 					this.csvManager.convertCsv(tempPath).then(
 						(jsonData: { [key: string]: string }[]) => {
+							Log.do("Data received:", jsonData);
+
 							// add to languages
 							this.csvManager.addJsonToLangs(jsonData, langs)
 
