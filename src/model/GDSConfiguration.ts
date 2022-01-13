@@ -11,9 +11,6 @@ export default interface GDSConfiguration {
   /** Folder path where to create the files */
   outputPath: string
 
-  /** Temporary file path, can be used one by default */
-  tempPath?: string
-
   /** Show debug logs */
   debug?: boolean
 }

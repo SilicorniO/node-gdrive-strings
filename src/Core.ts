@@ -6,9 +6,6 @@ import Log from "./utils/log/Log"
 
 export default class Core {
 
-	// constants
-	static readonly DEFAULT_TEMP_FILE_PATH = "./node-gdrive-strings.temp"
-
 	// managers
 	downloadManager = new DownloadManager()
 	csvManager = new CsvManager()
@@ -18,35 +15,26 @@ export default class Core {
 
 	private executeSheet(
 		sheetUrl: string,
-		configuration: GDSConfiguration,
 		langs: { [key: string]: { [key: string]: string } },
 	): Promise<boolean> {
 		Log.d(`Processing sheet ${sheetUrl}`)
 
-		// define a temporary valid path
-		const tempPath = configuration.tempPath || Core.DEFAULT_TEMP_FILE_PATH
-
 		return new Promise((resolve, reject) => {
 			// download the sheet
-			this.downloadManager.downloadFile(sheetUrl, tempPath).then(
-				() => {
+			this.downloadManager.downloadFile(sheetUrl).then(
+				(text) => {
 					// convert to json
-					this.csvManager.convertCsv(tempPath).then(
+					this.csvManager.convertCsv(text).then(
 						(jsonData: { [key: string]: string }[]) => {
 							Log.do("Data received:", jsonData);
 
 							// add to languages
 							this.csvManager.addJsonToLangs(jsonData, langs)
 
-							// remove temp path
-							this.downloadManager.removeFile(tempPath)
-
 							// resolve
 							resolve(true)
 						},
 						(error) => {
-							// remove temp path
-							this.downloadManager.removeFile(tempPath)
 
 							// reject
 							Log.e(`Error converting data to CSV, it seems an app problem: ${error}`)
@@ -77,7 +65,7 @@ export default class Core {
 		// prepare all sheet promises
 		let resultOk = true
 		for (const sheetUrl of sheetUrls) {
-			resultOk = resultOk && await this.executeSheet(sheetUrl, configuration, langs)
+			resultOk = resultOk && await this.executeSheet(sheetUrl, langs)
 		}
 
 		// if false return here

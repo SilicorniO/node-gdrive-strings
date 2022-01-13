@@ -5,12 +5,12 @@ export default class CsvManager {
 
 	static readonly ISO_LANGUAGE_LENGTH = 2
 
-	convertCsv(url: string): Promise<{ [key: string]: string }[]> {
+	convertCsv(text: string): Promise<{ [key: string]: string }[]> {
 		return new Promise<{ [key: string]: string }[]>((resolve, reject) => {
 			CsvToJson({
 				delimiter: ",",
 			})
-				.fromFile(url)
+				.fromString(text)
 				.then(
 					(jsonObj: { [key: string]: string }[]) => {
 						resolve(jsonObj)
